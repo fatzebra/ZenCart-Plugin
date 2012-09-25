@@ -22,6 +22,18 @@ Installation
 
 Default credentials are provided, however if you wish to obtain a free Sandbox account please [Contact Fat Zebra](https://www.fatzebra.com.au/contact)
 
+Uninstalling
+------------
+
+1. Log into ZenCart Admin/Management, and click on Modules -> Payment
+2. Click on **Fat Zebra**, then click **Remove**.
+3. Click **Remove** to confirm.
+4. Delete the files listed below.
+5. To remove all configuration items from the database run the following query on your ZenCart database:
+
+```sql
+  delete from configuration where configuration_key like '%FATZEBRA%';
+```
 
 Files
 -----
