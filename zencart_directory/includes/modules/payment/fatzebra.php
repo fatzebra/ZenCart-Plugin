@@ -3,6 +3,7 @@
   * Fat Zebra ZenCart Plugin
   *
   * Created September 2012 - Matthew Savage (matthew.savage@fatzebra.com.au)
+  * Version 1.0
   *
   * The original source for this library, including its tests can be found at
   * https://github.com/fatzebra/ZenCart-Plugin
