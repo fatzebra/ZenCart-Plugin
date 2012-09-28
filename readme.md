@@ -1,5 +1,5 @@
 
-Fat Zebra ZenCart Plugin v1.0
+Fat Zebra ZenCart Plugin v1.1
 =============================
 
 Compatible with Zen Cart 1.5.0 (and presumably above)
@@ -57,3 +57,8 @@ Support
 -------
 
 If you have problems with this plugin please create a new [Github Issue](https://github.com/fatzebra/ZenCart-Plugin/issues), or email support@fatzebra.com.au explaining the problem you are experiencing.
+
+Release Notes
+-------------
+1.0 - Initial Release
+1.1 - Fixed bug with checkout not handling declined cards properly

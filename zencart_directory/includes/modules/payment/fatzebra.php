@@ -3,7 +3,7 @@
   * Fat Zebra ZenCart Plugin
   *
   * Created September 2012 - Matthew Savage (matthew.savage@fatzebra.com.au)
-  * Version 1.0
+  * Version 1.1
   *
   * The original source for this library, including its tests can be found at
   * https://github.com/fatzebra/ZenCart-Plugin
@@ -192,7 +192,7 @@
     }
 
     function before_process() {
-      global $db, $order;
+      global $db, $order, $messageStack;
 
       $order->info['cc_number']  = str_pad(substr($temp=$_POST['cc_number'], -4), strlen($temp), 'X', STR_PAD_LEFT);
       $cc_expires_month = $_POST['cc_expires_month'];
@@ -241,13 +241,16 @@
       $result =  json_decode($data);
       if (is_null($result)) {
         $err = json_last_error();
+        $messageStack->add_session('checkout_payment', MODULE_PAYMENT_FATZEBRA_TEXT_DECLINED_MESSAGE . "<br /> Gateway error - please contact the website owner.", 'error');
         if ($err == JSON_ERROR_SYNTAX) {
-          throw new Exception("JSON Syntax error. JSON attempted to parse: " . $data);
+          error_log("JSON Syntax error. JSON attempted to parse: " . $data);
         } elseif ($err == JSON_ERROR_UTF8) {
-          throw new Exception("JSON Data invalid - Malformed UTF-8 characters. Data: " . $data);
+          error_log("JSON Data invalid - Malformed UTF-8 characters. Data: " . $data);
         } else {
-          throw new Exception("JSON parse failed. Unknown error ({$err}). Data:" . $data);
+          error_log("JSON parse failed. Unknown error ({$err}). Data:" . $data);
         }
+
+        zen_redirect(zen_href_link(FILENAME_CHECKOUT_PAYMENT, '', 'SSL', true, false));
       }
 
       if ($result->successful && $result->response->successful) {
@@ -257,16 +260,16 @@
         $this->order_status = 2; // Processing (payment made)
       } elseif ($result->successful && !$result->response->successful) {
         // Handle declined response here
-        $messageStack->add_session('checkout_payment', MODULE_PAYMENT_FATZEBRA_TEXT_DECLINED_MESSAGE . '<br />' . $result->response->message . '<br />' . MODULE_PAYMENT_FATZEBRA_TEXT_DECLINED_MESSAGE_TRY_AGAIN, 'error');
+        $messageStack->add_session('checkout_payment', MODULE_PAYMENT_FATZEBRA_TEXT_DECLINED_MESSAGE . $result->response->message . '<br />' . MODULE_PAYMENT_FATZEBRA_TEXT_DECLINED_MESSAGE_TRY_AGAIN, 'error');
         zen_redirect(zen_href_link(FILENAME_CHECKOUT_PAYMENT, '', 'SSL', true, false));
       } else {
         // There are error here...
         $errors = "";
         foreach($result->errors as $error) {
-          $errors .= $error . "<br />";
+          $errors .= "<li>{$error}</li>";
         }
 
-        $messageStack->add_session('checkout_payment', "Communications or Validations error - please contact website owner.<br />" . $errors, 'error');
+        $messageStack->add_session('checkout_payment', "Communication or Validation error - please contact website owner.<br /><ul>" . $errors . "</ul>", 'error');
         zen_redirect(zen_href_link(FILENAME_CHECKOUT_PAYMENT, '', 'SSL', true, false));
       }
     }
